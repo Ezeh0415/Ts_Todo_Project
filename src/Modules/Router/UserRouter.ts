@@ -1,4 +1,5 @@
 import express from "express";
+import { authenticate } from "../../Config/Config/JwtAuth";
 const router = express.Router();
 
 // signup imported
@@ -17,9 +18,27 @@ const ResendOtp = ResendOtpModule.default;
 const LoginModule = require("../Apis/Auth/Login/Login");
 const Login = LoginModule.default;
 
+// create Task imported
+const CreateTaskModule = require("../Apis/TaskPage/CreateTask/CreateTask");
+const CreateTask = CreateTaskModule.default;
+
+// update Priority imported
+const UpdatePriorityModule = require("../Apis/TaskPage/UpdatePriority/UpdatePriority");
+const UpdatePriority = UpdatePriorityModule.default;
+
+// update status imported
+const updateStatusModule = require("../Apis/TaskPage/UpdateStatus/UpdateStatus");
+const UpdateStatus = updateStatusModule.default;
+
+// Auth section
 router.post("/signup", SignUp);
 router.post("/VerifyOtp", VerifyOtp);
 router.post("/ResendOtp", ResendOtp);
 router.put("/login", Login);
+
+// task section
+router.post("/createTask", authenticate, CreateTask);
+router.patch("/updatePriority", authenticate, UpdatePriority);
+router.patch("/updateStatus,authenticate,UpdateStatus");
 
 export default router;
