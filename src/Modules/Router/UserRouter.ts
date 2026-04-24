@@ -39,6 +39,6 @@ router.put("/login", Login);
 // task section
 router.post("/createTask", authenticate, CreateTask);
 router.patch("/updatePriority", authenticate, UpdatePriority);
-router.patch("/updateStatus,authenticate,UpdateStatus");
+router.patch("/updateStatus", authenticate, UpdateStatus);
 
 export default router;
