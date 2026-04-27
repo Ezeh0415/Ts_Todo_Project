@@ -7,6 +7,7 @@ import {
   generateAccessToken,
   generateRefreshToken,
 } from "../../../../Utils/JWTSetup/GenerateJwt";
+import { SecurityLog } from "../../../Modal/SecurityLog/SecurityLog";
 
 const Login = async (req: Request, res: Response): Promise<object> => {
   try {
@@ -18,13 +19,56 @@ const Login = async (req: Request, res: Response): Promise<object> => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    if (user.lockedUntil && user.lockedUntil > new Date()) {
+      const remainingMinutes = Math.ceil((user.lockedUntil.getTime() - Date.now()) / 60000);
+      return res.status(403).json({
+        message: `Account is locked. Please try again in ${remainingMinutes} minutes`
+      });
+    }
+
+    // Lock account after 5 failed attempts
+    if (user.loginFailedCount >= 5) {
+      user.lockedUntil = new Date(Date.now() + 10 * 60 * 1000); // Lock for 10 minutes
+      user.loginFailedCount = 0 //lock count reset
+      await user.save();
+
+      const securityLog = new SecurityLog({
+        userId: user._id,
+        action: "login",
+        status: "failed",
+        ipAddress: req.ip || req.socket.remoteAddress,
+        userAgent: req.headers['user-agent'] || 'Unknown',
+        metadata: {
+          loginMethod: 'password',
+          timestamp: new Date().toISOString(),
+          FailedReason: "Too many failed attempts. Account locked for 10 minutes"
+        }
+      })
+
+      await securityLog.save();
+
+      return res.status(403).json({
+        message: "Too many failed attempts. Account locked for 10 minutes",
+        lockedUntil: user.lockedUntil
+      });
+    }
+
     const isPasswordValid = await bcrypt.compare(
       validatedBody.password,
       user.password,
     );
 
     if (!isPasswordValid) {
+      // Increment failed login attempts
+      user.loginFailedCount = (user.loginFailedCount || 0) + 1;
+      user.save();
       return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    if (user.otpAdded === false) {
+      return res.status(403).json({
+        message: "otp verification is missing verify"
+      })
     }
 
     // generate jwt tokens
@@ -33,10 +77,25 @@ const Login = async (req: Request, res: Response): Promise<object> => {
 
     // save refresh token
     user.refreshToken = refreshToken;
-    user.save(); 
+    user.loginFailedCount = 0 //lock count reset
+    user.save();
+
+    const securityLog = new SecurityLog({
+      userId: user._id,
+      action: "login",
+      status: "success",
+      ipAddress: req.ip || req.socket.remoteAddress,
+      userAgent: req.headers['user-agent'] || 'Unknown',
+      metadata: {
+        loginMethod: 'password',
+        timestamp: new Date().toISOString()
+      }
+    })
+
+    await securityLog.save();
 
     const userObject = user.toObject();
-    const { password, otp, otpExpire, ...safeUser } = userObject;
+    const { password, otp, otpExpire, otpAdded, loginFailedCount, lockedUntil, ...safeUser } = userObject;
 
     return res
       .status(200)

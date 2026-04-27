@@ -37,7 +37,7 @@ const VerifyOtp = async (req: Request, res: Response): Promise<object> => {
     // update otp and otpExpire
     await UserModel.updateOne(
       { _id: FetchOtp._id },
-      { $set: { otp: "", otpExpire: "" } },
+      { $set: { otp: "", otpExpire: "", otpAdded: true } },
     );
 
     return res.status(200).json({ message: "Otp verified successfully" });

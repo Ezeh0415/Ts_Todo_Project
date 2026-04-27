@@ -39,7 +39,7 @@ const SignUp = async (req: Request, res: Response): Promise<object> => {
     }
 
     const userObject = result.toObject();
-    const { password, otp, otpExpire, ...safeUser } = userObject;
+    const { password, otp, otpExpire, otpAdded, loginFailedCount, lockedUntil, ...safeUser } = userObject;
     // Now safeUser has all fields EXCEPT password
 
     return res
