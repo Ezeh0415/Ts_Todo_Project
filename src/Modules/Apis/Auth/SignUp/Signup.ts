@@ -4,6 +4,7 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { UserModel } from "../../../Modal/UserSchema/User";
 import { NewOtp } from "../../../../Utils/GenerateOtp/Otp";
+import { SecurityLog } from "../../../Modal/SecurityLog/SecurityLog";
 const Config = require("../../../../Config/Config");
 
 const SignUp = async (req: Request, res: Response): Promise<object> => {
@@ -41,6 +42,20 @@ const SignUp = async (req: Request, res: Response): Promise<object> => {
     const userObject = result.toObject();
     const { password, otp, otpExpire, otpAdded, loginFailedCount, lockedUntil, ...safeUser } = userObject;
     // Now safeUser has all fields EXCEPT password
+
+    const securityLog = new SecurityLog({
+      userId: result._id,
+      action: "signup",
+      status: "success",
+      ipAddress: req.ip || req.socket.remoteAddress,
+      userAgent: req.headers['user-agent'] || 'Unknown',
+      metadata: {
+        Method: "signup",
+        timestamp: new Date().toISOString()
+      }
+    })
+
+    await securityLog.save();
 
     return res
       .status(201)

@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { z } from "zod";
 import { createUserOtpValidation } from "../../../Validate/OtpValidate/Otp";
 import { UserModel } from "../../../Modal/UserSchema/User";
+import { SecurityLog } from "../../../Modal/SecurityLog/SecurityLog";
 
 const VerifyOtp = async (req: Request, res: Response): Promise<object> => {
   try {
@@ -26,6 +27,20 @@ const VerifyOtp = async (req: Request, res: Response): Promise<object> => {
         { _id: FetchOtp._id },
         { $unset: { otp: "", otpExpire: "" } },
       );
+      const securityLog = new SecurityLog({
+        userId: FetchOtp._id,
+        action: "verifyOtp",
+        status: "Failed",
+        ipAddress: req.ip || req.socket.remoteAddress,
+        userAgent: req.headers['user-agent'] || 'Unknown',
+        metadata: {
+          verifyMethod: "email",
+          timestamp: new Date().toISOString(),
+          FailedReason: "Otp expired"
+        }
+      })
+
+      await securityLog.save();
       return res.status(400).json({ message: "OTP expired" });
     }
 
@@ -39,6 +54,20 @@ const VerifyOtp = async (req: Request, res: Response): Promise<object> => {
       { _id: FetchOtp._id },
       { $set: { otp: "", otpExpire: "", otpAdded: true } },
     );
+
+    const securityLog = new SecurityLog({
+      userId: FetchOtp._id,
+      action: "verifyOtp",
+      status: "success",
+      ipAddress: req.ip || req.socket.remoteAddress,
+      userAgent: req.headers['user-agent'] || 'Unknown',
+      metadata: {
+        verifyMethod: "email",
+        timestamp: new Date().toISOString()
+      }
+    })
+
+    await securityLog.save();
 
     return res.status(200).json({ message: "Otp verified successfully" });
   } catch (error) {

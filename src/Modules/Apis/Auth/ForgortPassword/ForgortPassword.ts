@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import { UserModel } from "../../../Modal/UserSchema/User";
+import { NewOtp } from "../../../../Utils/GenerateOtp/Otp";
 
 
 const ForgotPassword = async (req: Request, res: Response): Promise<void> => {
@@ -24,10 +25,12 @@ const ForgotPassword = async (req: Request, res: Response): Promise<void> => {
 
         await UserModel.updateOne(
             { _id: user?._id },
-            { $set: { password: "" } },
+            { $set: { password: "", otpAdded: false, otp: NewOtp, otpExpire: new Date(Date.now() + 10 * 60 * 1000) } },
         );
 
-        
+        // password deleted 
+        // new otp sent  now it would be sent to the users email 
+        // also send the link for the page to reset the password
 
     } catch (error) {
         if (error instanceof z.ZodError) {
@@ -44,3 +47,5 @@ const ForgotPassword = async (req: Request, res: Response): Promise<void> => {
         return;
     }
 }
+
+export default ForgotPassword

@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { z } from "zod";
 import { UserModel } from "../../../Modal/UserSchema/User";
 import { NewOtp } from "../../../../Utils/GenerateOtp/Otp";
+import { SecurityLog } from "../../../Modal/SecurityLog/SecurityLog";
 
 const ResendOtp = async (req: Request, res: Response): Promise<object> => {
   try {
@@ -24,6 +25,20 @@ const ResendOtp = async (req: Request, res: Response): Promise<object> => {
     user.otp = NewOtp;
     user.otpExpire = new Date(Date.now() + 10 * 60 * 1000);
     user.save();
+
+    const securityLog = new SecurityLog({
+      userId: user._id,
+      action: "ResendOtp",
+      status: "success",
+      ipAddress: req.ip || req.socket.remoteAddress,
+      userAgent: req.headers['user-agent'] || 'Unknown',
+      metadata: {
+        ResendMethod: "email",
+        timestamp: new Date().toISOString()
+      }
+    })
+
+    await securityLog.save();
 
     // then send otp to user email
 
