@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const createUserOtpValidation = z.object({
-  email: z.string().email("Invalid email address"),
+  email: z.string().email("Invalid email address").transform(email => email.toLowerCase()),
   otp: z
     .string()
     .length(6, "OTP must be exactly 6 characters")

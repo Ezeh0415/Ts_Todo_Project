@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { z } from "zod";
 import { UserModel } from "../../../Modal/UserSchema/User";
 import { NewOtp } from "../../../../Utils/GenerateOtp/Otp";
+import { SecurityLog } from "../../../Modal/SecurityLog/SecurityLog";
 
 
 const ForgotPassword = async (req: Request, res: Response): Promise<void> => {
@@ -23,15 +24,32 @@ const ForgotPassword = async (req: Request, res: Response): Promise<void> => {
             })
         }
 
+        // password deleted 
         await UserModel.updateOne(
             { _id: user?._id },
             { $set: { password: "", otpAdded: false, otp: NewOtp, otpExpire: new Date(Date.now() + 10 * 60 * 1000) } },
         );
 
-        // password deleted 
+        
         // new otp sent  now it would be sent to the users email 
         // also send the link for the page to reset the password
 
+         const securityLog = new SecurityLog({
+              userId: user?._id,
+              action: "ForgotPassword",
+              status: "success",
+              ipAddress: req.ip || req.socket.remoteAddress,
+              userAgent: req.headers['user-agent'] || 'Unknown',
+              metadata: {
+                Method: 'ForgotPassword',
+                timestamp: new Date().toISOString()
+              }
+            })
+
+           await securityLog.save()
+
+           res.status(200).json({message:" otp sent to email"})
+            return;
     } catch (error) {
         if (error instanceof z.ZodError) {
             res.status(400).json({

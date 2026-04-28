@@ -9,7 +9,7 @@ const ResendOtp = async (req: Request, res: Response): Promise<object> => {
     // get email from request body and validate it
     const { email } = z
       .object({
-        email: z.string().email(),
+        email: z.string().email("invalid email address").transform(email => email.toLowerCase()),
       })
       .parse(req.body);
 

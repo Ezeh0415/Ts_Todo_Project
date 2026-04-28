@@ -17,6 +17,8 @@ const ResendOtp = ResendOtpModule.default;
 const ForgotPasswordModule = require("../Apis/Auth/ForgortPassword/ForgortPassword");
 const ForgotPassword = ForgotPasswordModule.default;
 
+const ResetPasswordModule = require("../")
+
 // login imported
 const LoginModule = require("../Apis/Auth/Login/Login");
 const Login = LoginModule.default;
