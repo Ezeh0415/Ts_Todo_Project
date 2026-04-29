@@ -17,7 +17,8 @@ const ResendOtp = ResendOtpModule.default;
 const ForgotPasswordModule = require("../Apis/Auth/ForgortPassword/ForgortPassword");
 const ForgotPassword = ForgotPasswordModule.default;
 
-const ResetPasswordModule = require("../")
+const ResetPasswordModule = require("../Apis/Auth/ResetPassword/ResetPassword");
+const ResetPassword = ResetPasswordModule.default;
 
 // login imported
 const LoginModule = require("../Apis/Auth/Login/Login");
@@ -39,8 +40,9 @@ const UpdateStatus = updateStatusModule.default;
 router.post("/signup", SignUp);
 router.post("/VerifyOtp", VerifyOtp);
 router.post("/ResendOtp", ResendOtp);
-router.post("/forgotPassword", ForgotPassword);
 router.put("/login", Login);
+router.post("/forgotPassword", ForgotPassword);
+router.post("/resetPassword",ResetPassword);
 
 // task section
 router.post("/createTask", authenticate, CreateTask);

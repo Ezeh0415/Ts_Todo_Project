@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import { z } from "zod";
+const bcrypt = require("bcryptjs");
 import { UserModel } from "../../../Modal/UserSchema/User";
 import { SecurityLog } from "../../../Modal/SecurityLog/SecurityLog";
+const Config = require("../../../../Config/Config");
 
 const ResetPassword = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -28,6 +30,16 @@ const ResetPassword = async (req: Request, res: Response): Promise<void> => {
             res.status(404).json({
                 message: "user is not found try again "
             })
+            return;
+        }
+
+        const isPasswordValid = await bcrypt.compare(
+            password,
+            user.password,
+        );
+
+        if (isPasswordValid) {
+            res.status(500).json({ message: "you can`t use the same password" });
             return;
         }
 
@@ -59,11 +71,18 @@ const ResetPassword = async (req: Request, res: Response): Promise<void> => {
         // verify otp if correct
         if (user.otp !== otp) {
             res.status(400).json({
-                message: "this isn`t what i gave you"
+                message: "this otp isn`t what i gave you"
             })
+            return;
         }
 
-        const result = await UserModel.updateOne({ _id: user?._id }, { $set: { otp: "", otpExpire: "", password: password, otpAdded: true } })
+        const saltRounds: number = Config.HASH_SALT;
+        const HashedPassword = await bcrypt.hash(
+            password,
+            saltRounds,
+        );
+
+        const result = await UserModel.updateOne({ _id: user?._id }, { $set: { otp: "", otpExpire: "", password: HashedPassword, otpAdded: true } })
 
         if (!result) {
             res.status(500).json({ message: "uploading new password failed" })
@@ -71,6 +90,7 @@ const ResetPassword = async (req: Request, res: Response): Promise<void> => {
         }
 
         res.status(200).json({ message: "new password uploaded" })
+        return;
 
     } catch (error) {
         if (error instanceof z.ZodError) {

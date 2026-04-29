@@ -27,7 +27,7 @@ const ForgotPassword = async (req: Request, res: Response): Promise<void> => {
         // password deleted 
         await UserModel.updateOne(
             { _id: user?._id },
-            { $set: { password: "", otpAdded: false, otp: NewOtp, otpExpire: new Date(Date.now() + 10 * 60 * 1000) } },
+            { $set: { otpAdded: false, otp: NewOtp, otpExpire: new Date(Date.now() + 10 * 60 * 1000) } },
         );
 
         
