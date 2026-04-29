@@ -2,11 +2,13 @@ const express = require("express");
 const app = express();
 const Db = require("./Config/DataBase");
 const router = require("./Modules/Router/UserRouter");
+import passport from "passport";
 
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -28,7 +30,11 @@ async function connectWithRetry(maxRetries: number = 5): Promise<boolean> {
 }
 
 connectWithRetry();
-// console.log("userRoutes is:", router.default);
+
+
+app.use(passport.initialize())
+app.use(passport.session())
+
 
 app.use("/api/Ts/v1", router.default);
 
