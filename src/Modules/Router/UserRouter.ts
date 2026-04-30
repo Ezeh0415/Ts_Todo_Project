@@ -40,6 +40,9 @@ const UpdateStatus = updateStatusModule.default;
 
 const passport = configureGooglePassport();
 
+const registerModule = require("../Apis/OAuth/OAuth");
+const register = registerModule.default;
+
 // Auth section
 router.post("/signup", SignUp);
 router.post("/VerifyOtp", VerifyOtp);
@@ -55,7 +58,7 @@ router.get("/google", passport.authenticate('google', { scope: ['profile', 'emai
 
 // Google sends the user back to this URL
 router.get("/google/callback", passport.authenticate("google", { session: false, failureRedirect: "/login" }),
-    // userController.loginWithOauth//calls the controller logic
+    register //calls the controller logic
 );
 
 // task section
