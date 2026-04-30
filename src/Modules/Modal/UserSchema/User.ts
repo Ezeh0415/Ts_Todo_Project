@@ -2,6 +2,7 @@ import { Schema, Document, model } from "mongoose";
 import { string } from "zod";
 
 export interface IUser extends Document {
+  googleId: string;
   name: string;
   email: string;
   password: string;
@@ -17,6 +18,7 @@ export interface IUser extends Document {
 
 export const UserSchema = new Schema(
   {
+    googleId: { type: string },
     name: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true },

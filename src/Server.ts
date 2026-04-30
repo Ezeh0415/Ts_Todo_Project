@@ -1,8 +1,9 @@
 const express = require("express");
 const app = express();
-const Db = require("./Config/DataBase");
 const router = require("./Modules/Router/UserRouter");
 import passport from "passport";
+const session = require('express-session');
+const Config = require("./Config/Config")
 
 const port = process.env.PORT || 3000;
 
@@ -30,6 +31,18 @@ async function connectWithRetry(maxRetries: number = 5): Promise<boolean> {
 }
 
 connectWithRetry();
+
+
+// Session middleware (REQUIRED for passport)
+app.use(session({
+    secret: Config.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: false, // Set to true if using HTTPS
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
 
 
 app.use(passport.initialize())

@@ -1,5 +1,7 @@
 import express from "express";
 import { authenticate } from "../../Config/Config/JwtAuth";
+import { configureGooglePassport } from "../../Config/Config/Passport";
+
 const router = express.Router();
 
 // signup imported
@@ -36,13 +38,25 @@ const UpdatePriority = UpdatePriorityModule.default;
 const updateStatusModule = require("../Apis/TaskPage/UpdateStatus/UpdateStatus");
 const UpdateStatus = updateStatusModule.default;
 
+const passport = configureGooglePassport();
+
 // Auth section
 router.post("/signup", SignUp);
 router.post("/VerifyOtp", VerifyOtp);
 router.post("/ResendOtp", ResendOtp);
 router.put("/login", Login);
 router.post("/forgotPassword", ForgotPassword);
-router.post("/resetPassword",ResetPassword);
+router.post("/resetPassword", ResetPassword);
+
+// Google Auth Routes
+
+// Redirect the user to Google
+router.get("/google", passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' }))
+
+// Google sends the user back to this URL
+router.get("/google/callback", passport.authenticate("google", { session: false, failureRedirect: "/login" }),
+    // userController.loginWithOauth//calls the controller logic
+);
 
 // task section
 router.post("/createTask", authenticate, CreateTask);
