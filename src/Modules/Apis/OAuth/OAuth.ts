@@ -23,7 +23,7 @@ const register = async (req: Request, res: Response, next: NextFunction): Promis
             return;
         }
 
-        
+
 
         const token = await generateAccessToken(FetchUser._id, FetchUser.email)
         const refreshToken = await generateRefreshToken(FetchUser._id, FetchUser.email)
@@ -34,7 +34,7 @@ const register = async (req: Request, res: Response, next: NextFunction): Promis
         const userObject = FetchUser.toObject();
         const { password, otp, otpExpire, otpAdded, loginFailedCount, lockedUntil, ...safeUser } = userObject;
 
-        res.status(200).json({ message: "login successful", safeUser, token })
+        res.status(200).json({ message: "login successful", user: safeUser, token })
         return;
     } catch (error) {
         next(error);

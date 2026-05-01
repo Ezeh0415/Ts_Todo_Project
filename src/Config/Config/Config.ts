@@ -17,7 +17,9 @@ const configSchema = z.object({
   JWT_REFRESH_TOKEN_EXPIRE: z.string(),
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
-  SESSION_SECRET: z.string()
+  SESSION_SECRET: z.string(),
+  TWITTER_CONSUMER_KEY: z.string(),
+  TWITTER_CONSUMER_SECRET: z.string()
 });
 
 const config = configSchema.parse(process.env);
