@@ -38,6 +38,11 @@ const UpdatePriority = UpdatePriorityModule.default;
 const updateStatusModule = require("../Apis/TaskPage/UpdateStatus/UpdateStatus");
 const UpdateStatus = updateStatusModule.default;
 
+const DeleteTaskModule = require("../Apis/TaskPage/SoftDeleteTask/SoftDeleteTask");
+const DeleteTask = DeleteTaskModule.default;
+
+
+
 const passport = configureGooglePassport();
 
 const registerModule = require("../Apis/OAuth/OAuth");
@@ -61,9 +66,11 @@ router.get("/google/callback", passport.authenticate("google", { session: false,
     register //calls the controller logic
 );
 
+
 // task section
 router.post("/createTask", authenticate, CreateTask);
 router.patch("/updatePriority", authenticate, UpdatePriority);
 router.patch("/updateStatus", authenticate, UpdateStatus);
+router.delete("/deleteTask", authenticate, DeleteTask);
 
 export default router;

@@ -9,6 +9,7 @@ export interface ITask extends Document {
   dueDate: Date;
   priority: string;
   status: string;
+  softDelete: boolean;
 }
 
 export const TaskSchema = new Schema<ITask>(
@@ -37,6 +38,7 @@ export const TaskSchema = new Schema<ITask>(
       required: true,
       default: "in-Progress",
     },
+    softDelete: { type: Boolean, default: false },
   },
   { timestamps: true },
 );
