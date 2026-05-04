@@ -41,6 +41,9 @@ const UpdateStatus = updateStatusModule.default;
 const DeleteTaskModule = require("../Apis/TaskPage/SoftDeleteTask/SoftDeleteTask");
 const DeleteTask = DeleteTaskModule.default;
 
+const CreatePaymentModule = require("../Apis/PaymentPage/CreatePayment/CreatePayment");
+const CreatePayment = CreatePaymentModule.default;
+
 
 
 const passport = configureGooglePassport();
@@ -72,5 +75,8 @@ router.post("/createTask", authenticate, CreateTask);
 router.patch("/updatePriority", authenticate, UpdatePriority);
 router.patch("/updateStatus", authenticate, UpdateStatus);
 router.delete("/deleteTask", authenticate, DeleteTask);
+
+// payment section 
+router.post("/createPayment", authenticate, CreatePayment);
 
 export default router;

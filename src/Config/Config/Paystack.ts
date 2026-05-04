@@ -1,0 +1,14 @@
+const Config = require("../Config/Config");
+
+const PAYSTACK_SECRET_KEY = Config.PAYSTACK_SECRET_KEY;
+const WEB_HOOK_SECRET_KEY = Config.PAYSTACK_SECRET_KEY;
+const PAYSTACK_PUBLIC_KEY = Config.PAYSTACK_PUBLIC_KEY;
+const PAYSTACK_BASE_URL = Config.PAYSTACK_BASE_URL;
+
+module.exports = {
+    PAYSTACK_SECRET_KEY,
+    WEB_HOOK_SECRET_KEY,
+    PAYSTACK_PUBLIC_KEY,
+    PAYSTACK_BASE_URL,
+};
+

@@ -19,7 +19,10 @@ const configSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string(),
   SESSION_SECRET: z.string(),
   TWITTER_CONSUMER_KEY: z.string(),
-  TWITTER_CONSUMER_SECRET: z.string()
+  TWITTER_CONSUMER_SECRET: z.string(),
+  PAYSTACK_SECRET_KEY: z.string(),
+  PAYSTACK_PUBLIC_KEY: z.string(),
+  PAYSTACK_BASE_URL: z.string(),
 });
 
 const config = configSchema.parse(process.env);
