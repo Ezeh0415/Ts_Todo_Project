@@ -1,22 +1,22 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { z } from "zod";
 import { UserModel } from "../../../Modal/UserSchema/User";
 import axios from "axios";
-import { initialize } from "passport";
 import { PaymentModel } from "../../../Modal/PaymentSchema/Payment";
+import { AuthRequest } from "../../../../Config/Config/JwtAuth";
+import { SecurityLog } from "../../../Modal/SecurityLog/SecurityLog";
 const { PAYSTACK_SECRET_KEY, PAYSTACK_BASE_URL } = require("../../../../Config/Config");
 
 
 
-const CreatePayment = async (req: Request, res: Response): Promise<void> => {
+const CreatePayment = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
 
-        const { email, amount } = z.object({
-            email: z.string().email(),
+        const { amount } = z.object({
             amount: z.number()
         }).parse(req.body)
 
-        const isUserExist = await UserModel.findOne({ email });
+        const isUserExist = await UserModel.findById(req.user?.userId);
 
         if (!isUserExist) {
             res.status(404).json({
@@ -37,7 +37,7 @@ const CreatePayment = async (req: Request, res: Response): Promise<void> => {
 
         const response = await axios.post(`${PAYSTACK_BASE_URL}/transaction/initialize`,
             {
-                email: email,
+                email: isUserExist.email,
                 amount: amount * 100,
 
             },
@@ -61,16 +61,32 @@ const CreatePayment = async (req: Request, res: Response): Promise<void> => {
             reference: response.data.data.reference,
             accessCode: response.data.data.access_code,
             paymentRef: response.data.data.reference,
-            authorizationCode: response.data.data.authorization,
+            authorizationCode: response.data.data?.authorization_url,
             userId: isUserExist._id,
             amount: amount,
             amountInKobo: amount * 100,
-            customerEmail: email,
+            customerEmail: isUserExist.email,
             customerName: isUserExist.name,
-            status: response.data.data.status
+            status: response.data.data?.status || "pending"
         }
 
+
+
         const result = await PaymentModel.create(PaymentData);
+
+            const securityLog = new SecurityLog({
+              userId: result._id,
+              action: "Payment creation",
+              status: "success",
+              ipAddress: req.ip || req.socket.remoteAddress,
+              userAgent: req.headers['user-agent'] || 'Unknown',
+              metadata: {
+                Method: "Payment creation",
+                timestamp: new Date().toISOString()
+              }
+            })
+        
+            await securityLog.save();
 
         if (!result) {
             res.status(404).json({
