@@ -1,6 +1,9 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { authenticate } from "../../Config/Config/JwtAuth";
 import { configureGooglePassport } from "../../Config/Config/Passport";
+const crypto = require('crypto');
+const { WEB_HOOK_SECRET_KEY } = require("../../Config/Config");
+
 
 const router = express.Router();
 
@@ -44,6 +47,10 @@ const DeleteTask = DeleteTaskModule.default;
 const CreatePaymentModule = require("../Apis/PaymentPage/CreatePayment/CreatePayment");
 const CreatePayment = CreatePaymentModule.default;
 
+const PaystackWebhookModule = require("../Apis/PaymentPage/PaystackWebhook/PaystackWebhook");
+const PaystackWebhook = PaystackWebhookModule.default;
+
+
 
 
 const passport = configureGooglePassport();
@@ -78,5 +85,5 @@ router.delete("/deleteTask", authenticate, DeleteTask);
 
 // payment section 
 router.post("/createPayment", authenticate, CreatePayment);
-
+router.post("/webhook", express.json(),  PaystackWebhook);
 export default router;

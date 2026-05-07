@@ -11,6 +11,10 @@ export interface IPayment extends Document {
     customerEmail: string;
     customerName: string;
     status: string;
+    paidAt: Date;
+    transactionId: string;
+    paymentMethod: string;
+    metadata: object;
 }
 
 const PaymentSchema = new Schema<IPayment>({
@@ -24,6 +28,10 @@ const PaymentSchema = new Schema<IPayment>({
     customerEmail: { type: String, required: true },
     customerName: { type: String, required: true },
     status: { type: String, required: true },
+    paidAt: { type: Date },
+    transactionId: { type: String },
+    paymentMethod: { type: String },
+    metadata: { type: Object },
 }, { timestamps: true });
 
 export const PaymentModel = model<IPayment>("Payment", PaymentSchema);

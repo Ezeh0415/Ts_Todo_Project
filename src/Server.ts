@@ -53,4 +53,5 @@ app.use("/api/Ts/v1", router.default);
 
 app.listen(port, (): void => {
   console.log(`Server is running on port ${port}`);
+  //  cloudflared tunnel --url http://localhost:3333
 });
