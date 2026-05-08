@@ -23,6 +23,9 @@ const configSchema = z.object({
   PAYSTACK_SECRET_KEY: z.string(),
   PAYSTACK_PUBLIC_KEY: z.string(),
   PAYSTACK_BASE_URL: z.string(),
+  FLUTTER_SECRET_KEY: z.string(),
+  FLUTTER_PUBLIC_KEY: z.string(),
+  FLUTTER_ENCRYPTION_KEY: z.string(),
 });
 
 const config = configSchema.parse(process.env);
