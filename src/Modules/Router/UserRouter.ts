@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { authenticate } from "../../Config/Config/JwtAuth";
 import { configureGooglePassport } from "../../Config/Config/Passport";
+import createTransferRecipient from "../Apis/PaymentPage/FlutterWave/Transfar";
 const crypto = require('crypto');
 const { WEB_HOOK_SECRET_KEY } = require("../../Config/Config");
 
@@ -85,5 +86,7 @@ router.delete("/deleteTask", authenticate, DeleteTask);
 
 // payment section 
 router.post("/createPayment", authenticate, CreatePayment);
-router.post("/webhook", express.json(),  PaystackWebhook);
+router.post("/webhook", express.json(), PaystackWebhook);
+// fultterwave payment app
+router.post("/getAccount", authenticate, createTransferRecipient);
 export default router;
