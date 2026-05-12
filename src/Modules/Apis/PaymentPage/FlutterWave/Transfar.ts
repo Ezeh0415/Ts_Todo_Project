@@ -4,7 +4,8 @@ import { AuthRequest } from "../../../../Config/Config/JwtAuth";
 import z from "zod";
 import { Response } from "express";
 import { UserModel } from "../../../Modal/UserSchema/User";
-
+import { TransferModel } from "../../../Modal/TransferSchema/TransferSchema";
+import crypto from 'crypto';
 interface BankDetails {
     account_number: string;
     code: string;
@@ -25,6 +26,7 @@ interface RecipientResponse {
 const createTransferRecipient = async (req: AuthRequest, res: Response): Promise<RecipientResponse | void> => {
     try {
         const token = await getFlutterwaveToken();
+        const bearerToken = token.access_token || token;
         const userId = req.user?.userId;
 
         const { email, accountNumber, bankCode } = z.object({
@@ -42,9 +44,11 @@ const createTransferRecipient = async (req: AuthRequest, res: Response): Promise
 
 
 
+
+
         const existingRecipients = await axios.get('https://developersandbox-api.flutterwave.com/transfers/recipients', {
             headers: {
-                'Authorization': `Bearer ${token.access_token}`
+                'Authorization': `Bearer ${bearerToken}`
             }
         });
 
@@ -91,7 +95,18 @@ const createTransferRecipient = async (req: AuthRequest, res: Response): Promise
             }
         )
 
-        console.log(' Recipient Created:', response.data);
+
+        const result = await TransferModel.create({
+            userId: user?._id,
+            flutterId: response.data.data?.id.toString(),
+            idempotencyKey: idempotencyKey,
+            traceId: traceId,
+            status: "recipient_created"
+        })
+
+        if (!result) {
+            res.status(400).json({ message: "transfer receipt not saved " })
+        }
         return response.data;
     } catch (error: any) {
         const token = await getFlutterwaveToken();
