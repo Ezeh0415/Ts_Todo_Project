@@ -107,7 +107,7 @@ const createTransferRecipient = async (req: AuthRequest, res: Response): Promise
                 }
             );
             console.log(searchResponse.data.data);
-            return searchResponse.data.data[0];
+            return searchResponse.data.data;
 
         }
 
