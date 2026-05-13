@@ -51,6 +51,9 @@ const CreatePayment = CreatePaymentModule.default;
 const PaystackWebhookModule = require("../Apis/PaymentPage/PaystackWebhook/PaystackWebhook");
 const PaystackWebhook = PaystackWebhookModule.default;
 
+const initiateTransferModule = require("../Apis/PaymentPage/FlutterWave/InitiateTransfar");
+const initiateTransfer = initiateTransferModule.default;
+
 
 
 
@@ -89,4 +92,5 @@ router.post("/createPayment", authenticate, CreatePayment);
 router.post("/webhook", express.json(), PaystackWebhook);
 // fultterwave payment app
 router.post("/getAccount", authenticate, createTransferRecipient);
+router.post("/initiateTransfer", authenticate, initiateTransfer)
 export default router;

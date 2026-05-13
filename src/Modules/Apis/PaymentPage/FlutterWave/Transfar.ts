@@ -101,12 +101,16 @@ const createTransferRecipient = async (req: AuthRequest, res: Response): Promise
             flutterId: response.data.data?.id.toString(),
             idempotencyKey: idempotencyKey,
             traceId: traceId,
-            status: "recipient_created"
+            status: "recipient_created",
+            name: {
+                    fullName: response.data.data?.name
+            }
         })
 
         if (!result) {
             res.status(400).json({ message: "transfer receipt not saved " })
         }
+        
         return response.data;
     } catch (error: any) {
         const token = await getFlutterwaveToken();

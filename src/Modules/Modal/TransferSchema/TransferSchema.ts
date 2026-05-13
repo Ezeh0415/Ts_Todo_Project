@@ -10,6 +10,7 @@ export interface ITransfer extends Document {
     idempotencyKey: string;
     traceId: string;
     reference: string;
+    name: object;
 }
 
 const TransferSchema = new Schema<ITransfer>({
@@ -21,7 +22,8 @@ const TransferSchema = new Schema<ITransfer>({
     metadata: { type: Object },
     idempotencyKey: { type: String, required: true, unique: true },
     traceId: { type: String, required: true, unique: true },
-    reference: { type: String }
+    reference: { type: String },
+    name: { type: Object },
 }, { timestamps: true });
 
 export const TransferModel = model<ITransfer>("Transfer", TransferSchema);
