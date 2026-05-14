@@ -5,6 +5,7 @@ import { TransferModel } from "../../../Modal/TransferSchema/TransferSchema";
 import axios, { AxiosResponse } from "axios";
 import getFlutterwaveToken from "./GetFlutterWaveToken";
 import { meta } from "zod/v4/core";
+import createTransferRecipient from "./Transfar";
 
 interface ITransferResponse {
     status: string;
@@ -40,7 +41,7 @@ interface ITransferResponse {
 
 const initiateTransfer = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-        const { amount,action,narration } = z.object({
+        const { amount, action, narration } = z.object({
             amount: z.number(),
             action: z.string(),
             narration: z.string()
@@ -49,9 +50,11 @@ const initiateTransfer = async (req: AuthRequest, res: Response): Promise<void> 
         const token = await getFlutterwaveToken();
         const bearerToken = token.access_token || token;
 
+        // const TransferReceipt: any = await createTransferRecipient(req, res);
+
         const userId = req.user?.userId;
 
-        const transfer = await TransferModel.findOne({ userId: userId });
+        const transfer = await TransferModel.findOne({ flutterId: TransferReceipt.flutterId });
 
         if (!transfer) {
             res.status(400).json({
@@ -60,28 +63,34 @@ const initiateTransfer = async (req: AuthRequest, res: Response): Promise<void> 
             })
         }
 
-        const response: AxiosResponse<ITransferResponse> = await axios.post(
-            'https://developersandbox-api.flutterwave.com/transfers',
+        // const nameData = transfer?.name as { name?: object };
+        // const name = nameData?.name;
 
-            {
-                'action': action,
-                'reference': transfer?.traceId,
-                'narration': narration,
-                'meta' : {
+        console.log(transfer);
 
-                }
-            },
-            
-            {
-                headers: {
-                    'Authorization': `Bearer ${bearerToken}`,
-                    'Content-Type': 'application/json',
-                    'X-Trace-Id': transfer?.traceId,
-                    'X-Idempotency-Key': transfer?.idempotencyKey,
-                    'X-Scenario-Key': "successful"
-                }
-            }
-        )
+
+        // const response: AxiosResponse<ITransferResponse> = await axios.post(
+        //     'https://developersandbox-api.flutterwave.com/transfers',
+
+        //     {
+        //         'action': action,
+        //         'reference': transfer?.traceId,
+        //         'narration': narration,
+        //         'meta': {
+        //             name: name
+        //         }
+        //     },
+
+        //     {
+        //         headers: {
+        //             'Authorization': `Bearer ${bearerToken}`,
+        //             'Content-Type': 'application/json',
+        //             'X-Trace-Id': transfer?.traceId,
+        //             'X-Idempotency-Key': transfer?.idempotencyKey,
+        //             'X-Scenario-Key': "successful"
+        //         }
+        //     }
+        // )
 
     } catch (error) {
         if (error instanceof z.ZodError) {
