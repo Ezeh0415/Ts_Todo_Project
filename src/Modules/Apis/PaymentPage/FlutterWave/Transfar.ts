@@ -118,10 +118,7 @@ const createTransferRecipient = async (ReceiptData: ReceiptData): Promise<Recipi
             flutterId: response.data.data?.id.toString(),
             idempotencyKey: idempotencyKey,
             traceId: traceId,
-            status: "recipient_created",
-            name: {
-                name: response.data.data?.name
-            }
+            status: "recipient_created"
         })
 
         if (!result) {

@@ -91,6 +91,5 @@ router.delete("/deleteTask", authenticate, DeleteTask);
 router.post("/createPayment", authenticate, CreatePayment);
 router.post("/webhook", express.json(), PaystackWebhook);
 // fultterwave payment app
-router.post("/getAccount", authenticate, createTransferRecipient);
 router.post("/initiateTransfer", authenticate, initiateTransfer)
 export default router;
