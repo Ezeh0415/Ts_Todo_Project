@@ -54,6 +54,10 @@ const PaystackWebhook = PaystackWebhookModule.default;
 const initiateTransferModule = require("../Apis/PaymentPage/FlutterWave/InitiateTransfar");
 const initiateTransfer = initiateTransferModule.default;
 
+const TranserWebhookModule = require("../Apis/PaymentPage/FlutterWave/TransferCallback");
+const TranserWebhook = TranserWebhookModule.default;
+
+
 
 
 
@@ -92,4 +96,6 @@ router.post("/createPayment", authenticate, CreatePayment);
 router.post("/webhook", express.json(), PaystackWebhook);
 // fultterwave payment app
 router.post("/initiateTransfer", authenticate, initiateTransfer)
+// flutterwave webhook
+router.post("/webhook/transfer-callback",TranserWebhook);
 export default router;

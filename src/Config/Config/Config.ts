@@ -26,6 +26,7 @@ const configSchema = z.object({
   FLUTTER_SECRET_KEY: z.string(),
   FLUTTER_PUBLIC_KEY: z.string(),
   FLUTTER_ENCRYPTION_KEY: z.string(),
+  FLUTTER_SECRET_HASH: z.string(),
 });
 
 const config = configSchema.parse(process.env);

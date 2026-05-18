@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-const { FLUTTER_PUBLIC_KEY, FLUTTER_SECRET_KEY } = require("../../../../Config/Config")
+const { FLUTTER_PUBLIC_KEY, FLUTTER_SECRET_KEY, FLUTTER_SECRET_HASH } = require("../../../../Config/Config")
 
 interface TokenResponse {
     access_token: string;
@@ -31,6 +31,8 @@ const getFlutterwaveToken = async (): Promise<TokenResponse> => {
         throw error;
     }
 }
+
+
 
 export default getFlutterwaveToken;
 export { TokenResponse };
